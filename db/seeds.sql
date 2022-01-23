@@ -7,7 +7,7 @@ VALUES
 ("Security"),
 ("Maintenance");
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES
 ("Hospital Director", 340000.00, 1),
 ("Director of Operations", 250000.00, 1),
