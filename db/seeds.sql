@@ -1,4 +1,4 @@
-INSERT INTO department (dept_name)
+INSERT INTO department (department_name)
 VALUES
 ("Administration"),
 ("Billing"),
@@ -87,4 +87,3 @@ VALUES
 ("Iansan", "Natlan", 21, 19),
 ("Shinobu", "Kuki", 21, 19),
 ("Klee", "", 21, 19);
-
