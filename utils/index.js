@@ -53,7 +53,7 @@ const newDepartment = () => {
 };
 
 // View role and department table together
-const viewRole = () => {
+const viewRoles = () => {
     const sql = `SELECT roles.*, department.department_name AS department FROM roles LEFT JOIN department ON roles.department_id = department.id;`;
 
     db.query()(sql, (err, results) => {
@@ -77,7 +77,7 @@ const addRole = newRole => {
             console.log(err);
             return;
         } else {
-            viewRole();
+            viewRoles();
         }
     });
 };
@@ -252,14 +252,83 @@ const updateEmployee = answers => {
 };
 
 // Inquirer prompts for updating an existing employee
+const updateEmployees = () => {
+    const sql = `SELECT employee.first_name, employee.last_name, employee.id FROM employee;`;
 
+    db.query(sql, (err, data) => {
+        if (err) {
+            console.log(err)
+            return;
+        }
+        const employees = data.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Please select which employee's role you would like to change.",
+                choices: employees
+            }
+        ]).then(employeeResult => {
+            answers = [{ employee: employeeResult.employee }]
+            const sqlRoles = `SELECT roles.title, roles.id FROM roles;`;
 
-// Inquirer menu prompts
+            db.query(sqlRoles, (err, data) => {
+                if (err) {
+                    console.log(err)
+                    return;
+                }
+                const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        name: "newRole",
+                        message: "Please select the employee's new role!",
+                        choices: roles
+                    }
+                ]).then(rolesResult => {
+                    const roles = { roles: rolesResult.newRole };
+                    answers.push(roles);
+                    updateEmployee(answers);
+                })
+            });
+        });
+    });
+};
 
+// General inquirer prompts to move through tables
+function next() {
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "options",
+            message: "Please select one of the following options to proceed!",
+            choices: ["View all departments", "Add a new department", "View all roles", "Add a new role", "View all employees", "Add a new employee", "Update an existing employee's role", "Exit"]
+        }
+    ]).then(answer => {
+        if (answer.options === "View all departments") {
+            return viewDepartment();
+        }
+        else if (answer.options === "Add a new department") {
+            return newDepartment();
+        }
+        else if (answer.options === "View all roles") {
+            return viewRoles();
+        }
+        else if (answer.options === "Add a new role") {
+            return newRole();
+        }
+        else if (answer.options === "View all employees") {
+            return viewEmployees();
+        }
+        else if (answer.options === "Add a new employee") {
+            return newEmployee();
+        }
+        else if (answer.options === "Update an existing employee's role") {
+            return updateEmployees();
+        } else {
+            process.exit(0);
+        }
+    });
+};
 
-
-
-
-
-
-module.exports = { viewDepartment, newDepartment, viewRole, newRole, viewEmployees, newEmployee, updateEmployee };
+module.exports = { viewDepartment, newDepartment, viewRoles, newRole, viewEmployees, newEmployee, updateEmployee, updateEmployees };
